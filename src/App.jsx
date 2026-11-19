@@ -6,6 +6,35 @@ import { CATALOG, REGIONS } from './data/catalog.js'
 // ---------- helpers ----------
 const today = () => new Date().toISOString().slice(0, 10)
 const fmtRating = (r) => (r ? Number(r).toFixed(1).replace(/\.0$/, '') : '—')
+const PHOTO_BUCKET = 'entry-photos'
+const newPhotoName = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`) + '.jpg'
+
+// Shrink a picked photo to max 1200px on its long side, JPEG ~0.82.
+// Returns { blob, dataUrl } — blob for Supabase Storage, dataUrl for demo mode.
+// Falls back to the original file if the browser can't decode it (e.g. some HEIC cases).
+async function processImage(file) {
+  try {
+    const url = URL.createObjectURL(file)
+    const img = await new Promise((resolve, reject) => {
+      const i = new Image()
+      i.onload = () => resolve(i)
+      i.onerror = reject
+      i.src = url
+    })
+    const scale = Math.min(1, 1200 / Math.max(img.naturalWidth, img.naturalHeight))
+    const w = Math.max(1, Math.round(img.naturalWidth * scale))
+    const h = Math.max(1, Math.round(img.naturalHeight * scale))
+    const canvas = document.createElement('canvas')
+    canvas.width = w; canvas.height = h
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+    URL.revokeObjectURL(url)
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.82))
+    if (!blob) throw new Error('compress failed')
+    return { blob, dataUrl: canvas.toDataURL('image/jpeg', 0.82) }
+  } catch {
+    return { blob: file, dataUrl: null }
+  }
+}
 
 function Stars({ value, onChange }) {
   const [hover, setHover] = useState(0)
@@ -97,12 +126,31 @@ function AuthScreen({ onAuthed }) {
 // ---------- log / edit form ----------
 const emptyForm = { production_title: '', production_region: '', venue: '', city: '', date_seen: today(), rating: 0, seat: '', review: '' }
 
-function EntryForm({ initial, onSave, onCancel }) {
+function EntryForm({ initial, existingPhotoSrc, onSave, onCancel }) {
   const [form, setForm] = useState(initial || emptyForm)
   const [query, setQuery] = useState('')
   const [region, setRegion] = useState('All')
   const [manual, setManual] = useState(Boolean(initial && !CATALOG.some((c) => c.title === initial.production_title)))
+  const [photo, setPhoto] = useState(null) // { blob, dataUrl } — newly picked photo
+  const [photoPreview, setPhotoPreview] = useState(existingPhotoSrc || null)
+  const [photoRemoved, setPhotoRemoved] = useState(false)
+  const [saving, setSaving] = useState(false)
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }))
+
+  async function pickPhoto(e) {
+    const file = e.target.files && e.target.files[0]
+    if (!file) return
+    const processed = await processImage(file)
+    setPhoto(processed)
+    setPhotoRemoved(false)
+    setPhotoPreview(processed.dataUrl || URL.createObjectURL(processed.blob))
+  }
+
+  function removePhoto() {
+    setPhoto(null)
+    setPhotoPreview(null)
+    setPhotoRemoved(true)
+  }
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -114,11 +162,17 @@ function EntryForm({ initial, onSave, onCancel }) {
     setManual(false)
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
     if (!form.production_title.trim()) return alert('Pick a show or add one manually.')
     if (!form.rating) return alert('Add a rating (tap the stars).')
-    onSave({ ...form, rating: Number(form.rating) })
+    setSaving(true)
+    try {
+      await onSave(
+        { ...form, rating: Number(form.rating) },
+        { blob: photo ? photo.blob : null, dataUrl: photo ? photo.dataUrl : null, remove: photoRemoved }
+      )
+    } finally { setSaving(false) }
   }
 
   return (
@@ -158,8 +212,17 @@ function EntryForm({ initial, onSave, onCancel }) {
       <label>Your rating</label>
       <Stars value={form.rating} onChange={(v) => set('rating', v)} />
       <label>One-line review<input value={form.review} onChange={(e) => set('review', e.target.value)} placeholder="One line you'll remember" maxLength={140} /></label>
+      <label>Photo (optional) — Playbill, ticket, or the view from your seat
+        <input type="file" accept="image/*" onChange={pickPhoto} />
+      </label>
+      {photoPreview && (
+        <div className="photo-preview">
+          <img src={photoPreview} alt="Selected entry" />
+          <button type="button" className="ghost small" onClick={removePhoto}>Remove photo</button>
+        </div>
+      )}
       <div className="row">
-        <button className="primary" type="submit">Save entry</button>
+        <button className="primary" type="submit" disabled={saving}>{saving ? 'Saving…' : 'Save entry'}</button>
         {onCancel && <button type="button" className="ghost" onClick={onCancel}>Cancel</button>}
       </div>
     </form>
@@ -276,31 +339,69 @@ export default function App() {
   }
   useEffect(() => { if (user) loadEntries(user.id); else setEntries([]) }, [user])
 
-  async function saveEntry(entry) {
+  const [photoUrls, setPhotoUrls] = useState({})
+
+  // Resolve private storage paths to short-lived signed URLs for display.
+  useEffect(() => {
+    if (!isSupabaseConfigured || entries.length === 0) return
+    const paths = [...new Set(entries.map((e) => e.photo_path).filter(Boolean))]
+    if (paths.length === 0) { setPhotoUrls({}); return }
+    let cancelled = false
+    supabase.storage.from(PHOTO_BUCKET).createSignedUrls(paths, 60 * 60 * 6).then(({ data }) => {
+      if (cancelled || !data) return
+      const map = {}
+      data.forEach((d) => { if (d.path && d.signedUrl) map[d.path] = d.signedUrl })
+      setPhotoUrls(map)
+    })
+    return () => { cancelled = true }
+  }, [entries])
+
+  const photoSrcFor = (e) => (isSupabaseConfigured ? (e.photo_path ? photoUrls[e.photo_path] : null) : (e.photo_data || null))
+
+  async function saveEntry(entry, photo) {
     try {
-      if (editing) {
-        if (isSupabaseConfigured) {
-          const { error } = await supabase.from('diary_entries').update({ ...entry, updated_at: new Date().toISOString() }).eq('id', editing.id)
+      if (isSupabaseConfigured) {
+        let photoPath = editing ? (editing.photo_path || null) : null
+        if (photo && photo.remove && photoPath) {
+          await supabase.storage.from(PHOTO_BUCKET).remove([photoPath])
+          photoPath = null
+        }
+        if (photo && photo.blob) {
+          const path = `${user.id}/${newPhotoName()}`
+          const { error: upErr } = await supabase.storage.from(PHOTO_BUCKET).upload(path, photo.blob, { contentType: 'image/jpeg', upsert: false })
+          if (upErr) throw upErr
+          if (photoPath) await supabase.storage.from(PHOTO_BUCKET).remove([photoPath])
+          photoPath = path
+        }
+        const row = { ...entry, photo_path: photoPath }
+        if (editing) {
+          const { error } = await supabase.from('diary_entries').update({ ...row, updated_at: new Date().toISOString() }).eq('id', editing.id)
           if (error) throw error
-        } else demoEntries.update(user.id, editing.id, entry)
-        setEditing(null)
+          setEditing(null)
+        } else {
+          const { error } = await supabase.from('diary_entries').insert({ ...row, user_id: user.id })
+          if (error) throw error
+        }
       } else {
-        if (isSupabaseConfigured) {
-          const { error } = await supabase.from('diary_entries').insert({ ...entry, user_id: user.id })
-          if (error) throw error
-        } else demoEntries.insert(user.id, entry)
+        let photoData = editing ? (editing.photo_data || null) : null
+        if (photo && photo.remove) photoData = null
+        if (photo && photo.dataUrl) photoData = photo.dataUrl
+        const row = { ...entry, photo_data: photoData }
+        if (editing) { demoEntries.update(user.id, editing.id, row); setEditing(null) }
+        else demoEntries.insert(user.id, row)
       }
       await loadEntries(user.id)
       setTab('diary')
     } catch (err) { setError(err.message) }
   }
 
-  async function removeEntry(id) {
+  async function removeEntry(entry) {
     try {
       if (isSupabaseConfigured) {
-        const { error } = await supabase.from('diary_entries').delete().eq('id', id)
+        const { error } = await supabase.from('diary_entries').delete().eq('id', entry.id)
         if (error) throw error
-      } else demoEntries.remove(user.id, id)
+        if (entry.photo_path) await supabase.storage.from(PHOTO_BUCKET).remove([entry.photo_path])
+      } else demoEntries.remove(user.id, entry.id)
       setConfirmDelete(null)
       await loadEntries(user.id)
     } catch (err) { setError(err.message) }
@@ -335,17 +436,18 @@ export default function App() {
           {tab === 'diary' && (
             <section>
               <input placeholder="Search your diary" value={diaryQuery} onChange={(e) => setDiaryQuery(e.target.value)} />
-              {editing ? <EntryForm initial={editing} onSave={saveEntry} onCancel={() => setEditing(null)} /> : null}
+              {editing ? <EntryForm initial={editing} existingPhotoSrc={photoSrcFor(editing)} onSave={saveEntry} onCancel={() => setEditing(null)} /> : null}
               {!editing && diaryShown.length === 0 && <p className="muted center">No entries yet. Tap “Log a show” to add your first.</p>}
               {!editing && diaryShown.map((e) => (
                 <article key={e.id} className="card">
                   <div className="card-head"><h3>{e.production_title}</h3><StarsStatic value={Number(e.rating)} /></div>
+                  {photoSrcFor(e) && <img className="entry-photo" src={photoSrcFor(e)} alt={`Photo from ${e.production_title}`} loading="lazy" />}
                   <p className="muted">{e.date_seen} · {e.production_region || ''}{e.venue ? ` · ${e.venue}` : ''}{e.city ? `, ${e.city}` : ''}{e.seat ? ` · Seat: ${e.seat}` : ''}</p>
                   {e.review && <p>“{e.review}”</p>}
                   <div className="row">
                     <button className="ghost small" onClick={() => setEditing(e)}>Edit</button>
                     {confirmDelete === e.id
-                      ? <><span>Delete this entry?</span><button className="danger small" onClick={() => removeEntry(e.id)}>Confirm delete</button><button className="ghost small" onClick={() => setConfirmDelete(null)}>Keep</button></>
+                      ? <><span>Delete this entry?</span><button className="danger small" onClick={() => removeEntry(e)}>Confirm delete</button><button className="ghost small" onClick={() => setConfirmDelete(null)}>Keep</button></>
                       : <button className="ghost small" onClick={() => setConfirmDelete(e.id)}>Delete</button>}
                   </div>
                 </article>
