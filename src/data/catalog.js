@@ -1,5 +1,5 @@
 // Seeded catalog of real productions. No poster art (rights) — titles only.
-// 157 productions: Broadway, West End, and US Tour variants.
+// 219 productions: Broadway, West End, US Tour, and LA / SoCal variants.
 export const CATALOG = [
   {
     "title": "& Juliet",
@@ -942,7 +942,379 @@ export const CATALOG = [
     "region": "West End",
     "venue": "Apollo Victoria Theatre",
     "city": "London"
+  },
+  {
+    "title": "Les Misérables",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Hadestown",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Moulin Rouge! The Musical",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Suffs",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Stereophonic",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "The Notebook",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "The Book of Mormon",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "SIX",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Beetlejuice",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Monty Python's Spamalot",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Tina: The Tina Turner Musical",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "MJ The Musical",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "The Sound of Music",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Hell's Kitchen",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "The Phantom of the Opera",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Beauty and the Beast",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Wicked",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Harry Potter and the Cursed Child",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Hamilton",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Shucked",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Some Like It Hot",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "A Beautiful Noise",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Annie",
+    "region": "LA / SoCal",
+    "venue": "Hollywood Pantages Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "& Juliet",
+    "region": "LA / SoCal",
+    "venue": "Ahmanson Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Paranormal Activity",
+    "region": "LA / SoCal",
+    "venue": "Ahmanson Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Mamma Mia!",
+    "region": "LA / SoCal",
+    "venue": "Ahmanson Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Kim's Convenience",
+    "region": "LA / SoCal",
+    "venue": "Ahmanson Theatre",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Jaja's African Hair Braiding",
+    "region": "LA / SoCal",
+    "venue": "Mark Taper Forum",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Here Lies Love",
+    "region": "LA / SoCal",
+    "venue": "Mark Taper Forum",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Primary Trust",
+    "region": "LA / SoCal",
+    "venue": "Mark Taper Forum",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Eureka Day",
+    "region": "LA / SoCal",
+    "venue": "Pasadena Playhouse",
+    "city": "Pasadena"
+  },
+  {
+    "title": "Amadeus",
+    "region": "LA / SoCal",
+    "venue": "Pasadena Playhouse",
+    "city": "Pasadena"
+  },
+  {
+    "title": "Brigadoon",
+    "region": "LA / SoCal",
+    "venue": "Pasadena Playhouse",
+    "city": "Pasadena"
+  },
+  {
+    "title": "Mexodus",
+    "region": "LA / SoCal",
+    "venue": "Pasadena Playhouse",
+    "city": "Pasadena"
+  },
+  {
+    "title": "Am I Roxie?",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "littleboy/littleman",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Table 17",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Sylvia Sylvia Sylvia",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Dragon Mama",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "\"Master Harold\"...and the Boys",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Angry, Raucous, and Shamelessly Gorgeous",
+    "region": "LA / SoCal",
+    "venue": "Geffen Playhouse",
+    "city": "Los Angeles"
+  },
+  {
+    "title": "Some Like It Hot",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Moulin Rouge! The Musical",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Shucked",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "The Wiz",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "The Notebook",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Monty Python's Spamalot",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "SIX",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "The Sound of Music",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Harry Potter and the Cursed Child",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "The Phantom of the Opera",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "& Juliet",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "A Beautiful Noise",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Life of Pi",
+    "region": "LA / SoCal",
+    "venue": "Segerstrom Hall",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Million Dollar Quartet",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "The Heart Sellers",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "A Christmas Carol",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "God of Carnage",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Who's Afraid of Virginia Woolf?",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Cinderella: A Salsa Fairy Tale",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Eat Me",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
+  },
+  {
+    "title": "Fremont Ave.",
+    "region": "LA / SoCal",
+    "venue": "South Coast Repertory",
+    "city": "Costa Mesa"
   }
 ]
 
-export const REGIONS = ['All','Broadway','West End','US Tour']
+export const REGIONS = ['All','Broadway','West End','US Tour','LA / SoCal']
