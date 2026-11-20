@@ -67,6 +67,33 @@ function Stars({ value, onChange }) {
   )
 }
 
+// ---------- marquee tiles (original generated artwork — no poster art) ----------
+const TILE_PALETTES = [
+  ['#3b0f1e', '#d4af37'], ['#12284b', '#e8c877'], ['#173f35', '#d9b45b'],
+  ['#2e1a47', '#e3b505'], ['#4a1f1f', '#e8c877'], ['#0f2e3d', '#d4af37'],
+  ['#3d2c0f', '#f5efe0'], ['#241f3a', '#c9a227'], ['#401d3a', '#e8c877'],
+  ['#1d3320', '#d9b45b'], ['#53220f', '#f0d48a'], ['#14213d', '#d4af37'],
+]
+function tilePalette(title) {
+  let h = 0
+  const s = String(title || '')
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
+  return TILE_PALETTES[h % TILE_PALETTES.length]
+}
+function ShowTile({ title, region, variant }) {
+  const [bg, accent] = tilePalette(title)
+  const len = String(title || '').length
+  const sizeClass = variant === 'banner' ? (len > 34 ? 't-sm' : len > 20 ? 't-md' : 't-lg') : (len > 34 ? 't-xs' : len > 20 ? 't-xxs' : 't-sm')
+  return (
+    <div className={`tile ${variant} ${sizeClass}`} style={{ background: bg, borderColor: accent }} aria-hidden="true">
+      <span className="tile-rule" style={{ background: accent }} />
+      <span className="tile-title" style={{ color: accent }}>{title}</span>
+      {region ? <span className="tile-region" style={{ color: accent }}>{region}</span> : null}
+      <span className="tile-rule" style={{ background: accent }} />
+    </div>
+  )
+}
+
 function StarsStatic({ value }) {
   return <span className="stars-static">{'★'.repeat(Math.round(value || 0))}<span className="dim">{'★'.repeat(5 - Math.round(value || 0))}</span> {fmtRating(value)}</span>
 }
@@ -186,7 +213,8 @@ function EntryForm({ initial, existingPhotoSrc, onSave, onCancel }) {
           <div className="catalog-list">
             {matches.map((c) => (
               <button type="button" key={c.title + c.region} className={form.production_title === c.title && form.production_region === c.region ? 'catalog-item selected' : 'catalog-item'} onClick={() => pick(c)}>
-                <strong>{c.title}</strong><span>{c.region} · {c.city}</span>
+                <ShowTile title={c.title} region={c.region} variant="thumb" />
+                <span className="catalog-text"><strong>{c.title}</strong><span>{c.region} · {c.city}</span></span>
               </button>
             ))}
             {matches.length === 0 && <p className="muted">No match in the catalog.</p>}
@@ -440,8 +468,10 @@ export default function App() {
               {!editing && diaryShown.length === 0 && <p className="muted center">No entries yet. Tap “Log a show” to add your first.</p>}
               {!editing && diaryShown.map((e) => (
                 <article key={e.id} className="card">
+                  {photoSrcFor(e)
+                    ? <img className="entry-photo" src={photoSrcFor(e)} alt={`Photo from ${e.production_title}`} loading="lazy" />
+                    : <ShowTile title={e.production_title} region={e.production_region} variant="banner" />}
                   <div className="card-head"><h3>{e.production_title}</h3><StarsStatic value={Number(e.rating)} /></div>
-                  {photoSrcFor(e) && <img className="entry-photo" src={photoSrcFor(e)} alt={`Photo from ${e.production_title}`} loading="lazy" />}
                   <p className="muted">{e.date_seen} · {e.production_region || ''}{e.venue ? ` · ${e.venue}` : ''}{e.city ? `, ${e.city}` : ''}{e.seat ? ` · Seat: ${e.seat}` : ''}</p>
                   {e.review && <p>“{e.review}”</p>}
                   <div className="row">
